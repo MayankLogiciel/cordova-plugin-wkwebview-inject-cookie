@@ -17,15 +17,18 @@
 var exec = require('cordova/exec');
 
 module.exports = {
-    injectCookie: function (url, successCallback, errorCallback) {
+    injectCookie: function (cookiesArray, successCallback, errorCallback) {
 
-        if ((url.substr(0,4)=="http")&&(url.indexOf("\/\/")>=0)) {
-          url = url.slice(url.indexOf("\/\/")+2);
-        };
-        var sPos = url.indexOf("\/");
-        var domain = url.substr(0,sPos);
-        var path = url.substr(sPos,(url.length-sPos));
+        for (var i = 0; i < cookiesArray.length; i++) {
+            exec(successCallback, errorCallback, 'WKWebViewInjectCookie', 'injectCookie', [
+               cookiesArray[i].domain,
+               cookiesArray[i].path ? cookiesArray[i].path : '/',
+               cookiesArray[i].name,
+               cookiesArray[i].value,
+               cookiesArray[i].secure ? cookiesArray[i].secure : true,
+               cookiesArray[i].maxAge ? cookiesArray[i].maxAge : 2592000
+            ]);
+        }
 
-        exec(successCallback, errorCallback, 'WKWebViewInjectCookie', 'injectCookie', [domain, path]);
     }
 };
